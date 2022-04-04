@@ -1,5 +1,5 @@
 export class StringBuilder {
-  private _inner: Array<string>;
+  private _store: Array<string>;
 
   constructor();
   constructor(value: string);
@@ -9,20 +9,24 @@ export class StringBuilder {
   constructor(value: StringBuilder);
   constructor(value?: string | number | boolean | string[] | StringBuilder) {
     if (typeof value === 'string') {
-      this._inner = [value];
+      this._store = [value];
     } else if (value instanceof Array) {
-      this._inner = value;
+      this._store = value;
     } else if (value instanceof StringBuilder) {
-      this._inner = value._inner;
+      this._store = value._store;
     } else if (value) {
-      this._inner = [value.toString()];
+      this._store = [value.toString()];
     } else {
-      this._inner = [];
+      this._store = [];
     }
   }
 
   get length() {
-    return this._inner.length;
+    return this._store.length;
+  }
+
+  * [Symbol.iterator]() {
+    yield* this._store;
   }
 
   append(value: string): void;
@@ -32,13 +36,13 @@ export class StringBuilder {
   append(value: StringBuilder): void;
   append(value: string | number | boolean | string[] | StringBuilder): void {
     if (typeof value === 'string') {
-      this._inner.push(value);
+      this._store.push(value);
     } else if (value instanceof Array) {
-      this._inner.push(...value);
+      this._store.push(...value);
     } else if (value instanceof StringBuilder) {
-      this._inner.push(...value._inner);
+      this._store.push(...value._store);
     } else {
-      this._inner.push(value.toString());
+      this._store.push(value.toString());
     }
   }
 
@@ -49,30 +53,30 @@ export class StringBuilder {
   insert(index: number, value: StringBuilder): void;
   insert(index: number, value: string | number | boolean | string[] | StringBuilder): void {
     if (typeof value === 'string') {
-      this._inner.splice(index, 0, value);
+      this._store.splice(index, 0, value);
     } else if (value instanceof Array) {
-      this._inner.splice(index, 0, ...value);
+      this._store.splice(index, 0, ...value);
     } else if (value instanceof StringBuilder) {
-      this._inner.splice(index, 0, ...value._inner);
+      this._store.splice(index, 0, ...value._store);
     } else {
-      this._inner.splice(index, 0, value.toString());
+      this._store.splice(index, 0, value.toString());
     }
   }
 
   clear() {
-    this._inner = [];
+    this._store = [];
   }
 
   remove(start: number, length: number) {
-    this._inner.splice(start, length);
+    this._store.splice(start, length);
   }
 
   replace(substr: string, replacement: string) {
-    this._inner = this._inner.map(s => s === substr ? replacement : s);
+    this._store = this._store.map(s => s === substr ? replacement : s);
   }
 
   toString() {
-    return this._inner.join('');
+    return this._store.join('');
   }
 
   equals(value: StringBuilder) {
